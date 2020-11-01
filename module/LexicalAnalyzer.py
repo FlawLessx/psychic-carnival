@@ -1,11 +1,12 @@
 import re
 
-
 class LexicalAnalyzer:
     # Token row
     lin_num = 1
 
     def tokenize(self, code):
+        result = []
+
         rules = [
             ('MAIN', r'main'),          # main
             ('INT', r'int'),            # int
@@ -70,6 +71,6 @@ class LexicalAnalyzer:
                     lexeme.append(token_lexeme)
                     row.append(self.lin_num)
                     # To print information about a Token
-                    print('Token = {0}, Lexeme = \'{1}\', Row = {2}, Column = {3}'.format(token_type, token_lexeme, self.lin_num, col))
+                    result.append('Token = {0}, Lexeme = \'{1}\', Row = {2}, Column = {3}'.format(token_type, token_lexeme, self.lin_num, col))
 
-        return token, lexeme, row, column
+        return token, lexeme, row, column, result

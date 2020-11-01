@@ -1,6 +1,11 @@
 class Buffer:
-    def load_buffer(self):
-        arq = open('program.c', 'r')
+    def load_file(self,path):
+        file = open(path, 'r')
+        result = file.read()
+        return result
+    
+    def load_buffer(self, path):
+        arq = open(path, 'r')
         text = arq.readline()
 
         buffer = []
@@ -20,5 +25,5 @@ class Buffer:
 
                 # Reset the buffer
                 buffer = []
-
+        
         arq.close()
