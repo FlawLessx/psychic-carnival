@@ -3,6 +3,16 @@ import os.path
 from module.Process import Process
 from module.Buffer import Buffer
 from module.LexicalAnalyzer import LexicalAnalyzer
+from numpy.matlib import rand
+
+#
+# VARIABEL
+#
+
+Buffer = Buffer()
+Process = Process()
+Analyzer = LexicalAnalyzer()
+result = []
 
 #
 # LAYOUT
@@ -28,10 +38,10 @@ list_button = [
 output_column = [
     [
         sg.Text("Lexical Analysis", justification='center',
-                font="Poppins", auto_size_text=True)
+                auto_size_text=True)
     ],
     [
-        sg.Listbox(values=[], size=(50, 30), key="-FILE LIST-")
+        sg.Listbox(values=[], size=(80, 30), key="Output")
     ]
 ]
 
@@ -48,15 +58,6 @@ layout = [
 
 window = sg.Window("FY Mini Compiler", layout)
 
-#
-# VARIABEL
-#
-
-Buffer = Buffer()
-Process = Process()
-Analyzer = LexicalAnalyzer()
-result = []
-
 # Program
 while True:
     event, values = window.read()
@@ -64,13 +65,15 @@ while True:
         break
     # Folder name was filled in, make a list of files in the folder
     if event == "process":
-        filePath = values["-FILENAME-"]
-        t, lex, lin, col, res = Process.process(
-            path=filePath, Buffer=Buffer, Analyzer=Analyzer)
+        code = str(values["source"])
+        t, tType, lex, lin, col, res = Process.process(
+            Buffer=Buffer, Analyzer=Analyzer, code=code.splitlines())
         result = res
-        window.Element("-FILE LIST-").update(result)
+        window.Element("Output").update(result)
     if event == "reset":
         window.Element("source").update("")
+        window.Element("Output").update("")
+        window.Element("-FILENAME-").update("")
     if event == "-FILENAME-":
         filePath = values["-FILENAME-"]
         window.Element("source").Update(Buffer.load_file(path=filePath))

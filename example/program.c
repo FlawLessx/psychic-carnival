@@ -1,3 +1,5 @@
+#include <conio.h>
+
 int main()
 {
     float a;
