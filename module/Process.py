@@ -2,7 +2,7 @@ from module.Buffer import Buffer
 from module.LexicalAnalyzer import LexicalAnalyzer
 
 class Process:
-    def process(self, Buffer, Analyzer, code):
+    def process(self, Buffer, Analyzer, code, lang):
 
         token = []
         tokenType = []
@@ -13,7 +13,7 @@ class Process:
 
         # Tokenize and reload of the buffer
         for i in code:
-            t, tType,lex, lin, col, res = Analyzer.tokenize(i)
+            t, tType,lex, lin, col, res = Analyzer.tokenize(i, lang=lang)
             token += t
             tokenType += tType
             lexeme += lex

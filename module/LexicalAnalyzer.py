@@ -5,10 +5,17 @@ class LexicalAnalyzer:
     # Token row
     lin_num = 1
 
-    def tokenize(self, code):
+    def tokenize(self, code, lang):
         result = []
 
         rules = [
+            ('HEADER', r'#include <(.*?)>' if lang == 'c' or lang == 'cpp' else r'import .*'),
+            ('BOOLEAN_CONST', r'(true|false)' if lang == 'c' or lang == 'cpp' else r'(True|False)'),
+            ('CONTINUE', r'continue'),
+            ('BREAK', r'break'),
+            ('CLASS', r'class'),
+            ('NAMESPACE', r'using namespace .*'),
+            ('BOOLEAN', r'bool'),
             ('MAIN', r'main'),          # main
             ('INT', r'int'),            # int
             ('FLOAT', r'float'),        # float
@@ -41,14 +48,15 @@ class LexicalAnalyzer:
             ('INTEGER_CONST', r'\d(\d)*'),          # INT
             ('NEWLINE', r'\n'),         # NEW LINE
             ('SKIP', r'[ \t]+'),
-            ('HEADER', r'#include <(.*?)>'),
-            ('STRING', r'\".*?\"'),
+            ('STRING_CONST', r'\".*?\"'),
+            ('COMMENT', r'//.*' if lang == 'c' or lang == 'cpp' else r'#.*'),
+            ('CHAR_CONST', r"\'.*?\'"),
         ]
 
         rulesType = [
             ('MAIN', 'IDENTIFIER'),          # main
-            ('INT', 'IDENTIFIER'),            # int
-            ('FLOAT', 'IDENTIFIER'),        # float
+            ('INT', 'KEYWORD'),            # int
+            ('FLOAT', 'KEYWORD'),        # float
             ('IF', 'KEYWORD'),              # if
             ('ELSE', 'KEYWORD'),          # else
             ('WHILE', 'KEYWORD'),        # while
@@ -73,13 +81,21 @@ class LexicalAnalyzer:
             ('MINUS', 'OPERATOR'),            # -
             ('MULT', 'OPERATOR'),            # *
             ('DIV', 'OPERATOR'),             # /
-            ('ID',  'KEYWORD'),     
-            ('FLOAT_CONST', 'IDENTIFIER'),   
-            ('INTEGER_CONST', 'IDENTIFIER'),          
-            ('NEWLINE',  'PUNCTUATION'),         
+            ('ID',  'IDENTIFIER'),     
+            ('FLOAT_CONST', 'LITERALS'),   
+            ('INTEGER_CONST', 'LITERALS'), 
+            ('NEWLINE',  'PUNCTUATION'),
             ('SKIP',  'PUNCTUATION'),
-            ('HEADER',  'IDENTIFIER'),
-            ('STRING', 'KEYWORD')
+            ('HEADER',  'KEYWORD'),
+            ('STRING_CONST', 'LITERALS'),
+            ('COMMENT', 'PUNCTUATION'),
+            ('BOOLEAN_CONST', 'LITERALS'),
+            ('CHAR_CONST', 'LITERALS'),
+            ('CLASS', 'KEYWORD'),
+            ('CONTINUE', 'KEYWORD'),
+            ('BREAK', 'KEYWORD'),
+            ('NAMESPACE', 'KEYWORD'),
+            ('BOOLEAN', 'KEYWORD')
         ]
 
         tokens_join = '|'.join('(?P<%s>%s)' % x for x in rules)
@@ -115,6 +131,7 @@ class LexicalAnalyzer:
                 for i in rulesType:
                     if i[0] == token_name:
                         tokenType = i[1]
+                        break
 
                 # Tambahkan ke hasil
                 result.append('Token = {0}, Type = {1}, Lexeme = \'{2}\', Row = {3}, Column = {4}'.format(

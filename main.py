@@ -22,7 +22,7 @@ source_column = [
         sg.Text("Load From File"),
         sg.In(size=(25, 1), enable_events=True, key="-FILENAME-"),
         sg.FileBrowse(key="browseFile", file_types=(
-            ("Text Files", "*.txt, *.c"),)),
+            ("Text Files", "*.txt"), ("Python Code", "*.py"), ("C Code", "*.c"), ("C++ Code", "*.cpp"))),
     ],
     [
         sg.Multiline(enter_submits=False, autoscroll=True, visible=True,
@@ -58,24 +58,50 @@ layout = [
 
 window = sg.Window("FY Mini Compiler", layout)
 
-# Program
+#
+# FUNCTION
+#
+def processFunc():
+    filePath = ''
+    fileSplit = ''
+    extension = ''
+    if values['-FILENAME-'] != '':
+        filePath = values["-FILENAME-"]
+        fileSplit = str(filePath).split('/')
+        extension = fileSplit[len(fileSplit)-1].split('.')[1]
+    else:
+        extension = sg.PopupGetText('Input langguange (c, cpp, py): ',)
+
+    code = str(values["source"])
+    t, tType, lex, lin, col, res = Process.process(
+        Buffer=Buffer, Analyzer=Analyzer, code=code.splitlines(), lang=extension)
+    result = res
+    window.Element("Output").update(result)
+
+
+def resetFunc():
+    window.Element("source").update("")
+    window.Element("Output").update("")
+    window.Element("-FILENAME-").update("")
+
+
+def getFile():
+    filePath = values["-FILENAME-"]
+    window.Element("source").Update(Buffer.load_file(path=filePath))
+
+
+#
+# Run Program
+#
 while True:
     event, values = window.read()
     if event == "Exit" or event == sg.WIN_CLOSED:
         break
-    # Folder name was filled in, make a list of files in the folder
     if event == "process":
-        code = str(values["source"])
-        t, tType, lex, lin, col, res = Process.process(
-            Buffer=Buffer, Analyzer=Analyzer, code=code.splitlines())
-        result = res
-        window.Element("Output").update(result)
+        processFunc()
     if event == "reset":
-        window.Element("source").update("")
-        window.Element("Output").update("")
-        window.Element("-FILENAME-").update("")
+        resetFunc()
     if event == "-FILENAME-":
-        filePath = values["-FILENAME-"]
-        window.Element("source").Update(Buffer.load_file(path=filePath))
+        getFile()
 
 window.close()
