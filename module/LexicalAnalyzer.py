@@ -123,7 +123,7 @@ class LexicalAnalyzer:
                 raise RuntimeError('%r unexpected on line %d' %
                                    (token_lexeme, self.lin_num))
             else:
-                col = m.start() - lin_start
+                col = (m.start() - lin_start) + 1
                 column.append(col)
                 token.append(token_name)
                 lexeme.append(token_lexeme)
