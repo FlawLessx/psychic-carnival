@@ -7,18 +7,18 @@ class Process:
         token = []
         tokenType = []
         lexeme = []
-        row = []
+        row = 1
         column = []
         result = []
 
         # Tokenize and reload of the buffer
         for i in code:
-            t, tType,lex, lin, col, res = Analyzer.tokenize(i, lang=lang)
+            t, tType,lex, lin, col, res = Analyzer.tokenize(code=i, lang=lang, row=row)
             token += t
             tokenType += tType
             lexeme += lex
-            row += lin
             column += col
+            row += 1
             result += res
 
         return token, tokenType, lexeme, row, column, result

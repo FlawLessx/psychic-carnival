@@ -5,16 +5,18 @@ class LexicalAnalyzer:
     # Token row
     lin_num = 1
 
-    def tokenize(self, code, lang):
+    def tokenize(self, row ,code, lang):
         result = []
 
         rules = [
             ('HEADER', r'#include <(.*?)>' if lang == 'c' or lang == 'cpp' else r'import .*'),
             ('BOOLEAN_CONST', r'(true|false)' if lang == 'c' or lang == 'cpp' else r'(True|False)'),
             ('CONTINUE', r'continue'),
+            ('COMMENT', r'//.*' if lang == 'c' or lang == 'cpp' else r'#.*'),
             ('BREAK', r'break'),
             ('CLASS', r'class'),
             ('NAMESPACE', r'using namespace .*'),
+            ('COLON', r':'),
             ('BOOLEAN', r'bool'),
             ('MAIN', r'main'),          # main
             ('INT', r'int'),            # int
@@ -49,7 +51,6 @@ class LexicalAnalyzer:
             ('NEWLINE', r'\n'),         # NEW LINE
             ('SKIP', r'[ \t]+'),
             ('STRING_CONST', r'\".*?\"'),
-            ('COMMENT', r'//.*' if lang == 'c' or lang == 'cpp' else r'#.*'),
             ('CHAR_CONST', r"\'.*?\'"),
         ]
 
@@ -95,7 +96,8 @@ class LexicalAnalyzer:
             ('CONTINUE', 'KEYWORD'),
             ('BREAK', 'KEYWORD'),
             ('NAMESPACE', 'KEYWORD'),
-            ('BOOLEAN', 'KEYWORD')
+            ('BOOLEAN', 'KEYWORD'),
+            ('COLON', 'PUNCTUATION')
         ]
 
         tokens_join = '|'.join('(?P<%s>%s)' % x for x in rules)
@@ -105,7 +107,6 @@ class LexicalAnalyzer:
         token = []
         tokenType = []
         lexeme = []
-        row = []
         column = []
 
         # It analyzes the code to find the lexemes and their respective Tokens
@@ -126,7 +127,6 @@ class LexicalAnalyzer:
                 column.append(col)
                 token.append(token_name)
                 lexeme.append(token_lexeme)
-                row.append(self.lin_num)
 
                 for i in rulesType:
                     if i[0] == token_name:
@@ -135,6 +135,6 @@ class LexicalAnalyzer:
 
                 # Tambahkan ke hasil
                 result.append('Token = {0}, Type = {1}, Lexeme = \'{2}\', Row = {3}, Column = {4}'.format(
-                    token_name, tokenType, token_lexeme, self.lin_num, col))
+                    token_name, tokenType, token_lexeme, row, col))
 
         return token, tokenType, lexeme, row, column, result

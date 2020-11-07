@@ -76,6 +76,7 @@ def processFunc():
     t, tType, lex, lin, col, res = Process.process(
         Buffer=Buffer, Analyzer=Analyzer, code=code.splitlines(), lang=extension)
     result = res
+
     window.Element("Output").update(result)
 
 
